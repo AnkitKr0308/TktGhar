@@ -1,9 +1,18 @@
 import React from "react";
 
-function Form({ fields = [], formData, onChange, ...props }) {
+function Form({
+  fields = [],
+  formData,
+  onChange,
+  btnLabel,
+  onSubmit,
+  errors = {},
+
+  ...props
+}) {
   return (
     <div>
-      <form class="max-w-sm mx-auto">
+      <form class="max-w-sm mx-auto" onSubmit={onSubmit}>
         <div class="mb-5">
           {fields.map((field) => (
             <div key={field.id} className="flex flex-col">
@@ -86,14 +95,24 @@ function Form({ fields = [], formData, onChange, ...props }) {
                   {...props}
                 />
               )}
+              {errors[field.id] && (
+                <span className="text-red-500 text-sm mt-1">
+                  {errors[field.id]}
+                </span>
+              )}
+              {errors.general && (
+                <div className="text-red-500 text-center mb-4">
+                  {errors.general}
+                </div>
+              )}
             </div>
           ))}
         </div>
         <button
           type="submit"
-          class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
         >
-          Submit
+          {btnLabel}
         </button>
       </form>
     </div>

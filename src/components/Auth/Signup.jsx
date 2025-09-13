@@ -1,13 +1,26 @@
 import React, { useState } from "react";
 import Form from "../templates/Form";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { signupUser } from "../../store/authSlice";
+import { setPopup } from "../../store/popupSlice";
 
 function Signup() {
   const [formData, setFormData] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [errors, setErrors] = useState({});
 
   const signupFields = [
     {
       id: "name",
       label: "Full Name",
+      type: "text",
+      required: true,
+    },
+    {
+      id: "username",
+      label: "Username",
       type: "text",
       required: true,
     },
@@ -20,13 +33,13 @@ function Signup() {
     },
     {
       id: "password",
-      label: "Enter Password",
+      label: "Password",
       type: "password",
       required: true,
     },
     {
       id: "phoneNumber",
-      label: "Enter Contact",
+      label: "Contact",
       type: "tel",
       required: true,
     },
@@ -40,15 +53,46 @@ function Signup() {
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
+    setErrors((prev) => ({ ...prev, [id]: "" }));
+  };
+
+  const handleSignup = async (formData) => {
+    try {
+      const submit = await dispatch(signupUser(formData));
+      const res = submit.payload;
+
+      if (submit.error) {
+        dispatch(setPopup({ message: "Signup failed", type: "error" }));
+      } else if (res?.success) {
+        navigate("/");
+      } else if (res?.message && typeof res.message === "object") {
+        setErrors(res.message);
+      } else {
+        dispatch(
+          setPopup({ message: res?.message || "Signup failed", type: "error" })
+        );
+      }
+    } catch (e) {
+      return { success: false, message: e.message || "Signup failed" };
+    }
   };
 
   return (
-    <div>
-      <Form
-        formData={formData}
-        fields={signupFields}
-        onChange={handleInputChange}
-      />
+    <div className="min-h-screen bg-gray-100 text-gray-800">
+      <main className="container mx-auto p-6">
+        <section className="bg-white p-6 rounded shadow-lg max-w-xl mx-auto mt-8">
+          <h2 className="text-2xl font-semibold mb-4 text-center">Signup</h2>
+
+          <Form
+            formData={formData}
+            fields={signupFields}
+            onChange={handleInputChange}
+            btnLabel="Register Account"
+            onSubmit={handleSignup}
+            errors={errors}
+          />
+        </section>
+      </main>
     </div>
   );
 }

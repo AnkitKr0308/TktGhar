@@ -14,10 +14,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800">
-      <header className="bg-blue-600 text-white p-4">
-        <h1 className="text-3xl font-bold">Train Ticket Booking</h1>
-      </header>
-
       <main className="container mx-auto p-6">
         <section className="bg-white p-6 rounded shadow-lg max-w-xl mx-auto mt-8">
           <h2 className="text-2xl font-semibold mb-4 text-center">
@@ -80,10 +76,6 @@ export default function HomePage() {
           </p>
         </section>
       </main>
-
-      <footer className="bg-gray-800 text-white text-center p-4 mt-12">
-        © 2025 Train Ticket Booking App. All rights reserved.
-      </footer>
     </div>
   );
 }

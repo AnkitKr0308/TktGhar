@@ -25,12 +25,19 @@ function Login() {
   };
 
   return (
-    <div>
-      <Form
-        fields={loginFields}
-        onChange={handleInputChange}
-        formData={formData}
-      />
+    <div className="min-h-screen bg-gray-100 text-gray-800">
+      <main className="container mx-auto p-6">
+        <section className="bg-white p-6 rounded shadow-lg max-w-xl mx-auto mt-8">
+          <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+
+          <Form
+            formData={formData}
+            fields={loginFields}
+            onChange={handleInputChange}
+            btnLabel="Login"
+          />
+        </section>
+      </main>
     </div>
   );
 }
