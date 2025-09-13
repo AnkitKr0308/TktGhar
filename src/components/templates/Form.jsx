@@ -10,10 +10,15 @@ function Form({
 
   ...props
 }) {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
   return (
     <div>
-      <form class="max-w-sm mx-auto" onSubmit={onSubmit}>
-        <div class="mb-5">
+      <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
+        <div className="mb-5">
           {fields.map((field) => (
             <div key={field.id} className="flex flex-col">
               <label

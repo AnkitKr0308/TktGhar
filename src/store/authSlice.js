@@ -1,52 +1,48 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { fetchLogin, fetchRegisterAccount } from "../API/authAPI";
 
+const parseJSON = (value) => {
+  try {
+    return value ? JSON.parse(value) : null;
+  } catch {
+    return null;
+  }
+};
+
 const getInitialAuthState = () => {
   const token = localStorage.getItem("jwt_token");
-  const user = localStorage.getItem("user");
+  const user = parseJSON(localStorage.getItem("user"));
 
   return {
     loading: false,
     token: token || null,
-    user: user ? JSON.parse(user) : null,
+    user,
     isAuthenticated: !!token,
     error: null,
   };
 };
 
+// Signup
 export const signupUser = createAsyncThunk(
   "auth/signupUser",
   async (userData, { rejectWithValue }) => {
-    try {
-      const res = await fetchRegisterAccount(userData);
-      if (res.success) {
-        return res.data;
-      }
-
-      if (res.errors) {
-        return rejectWithValue({ errors: res.errors });
-      }
-
-      return rejectWithValue({ errors: { general: res.message } });
-    } catch (e) {
-      return rejectWithValue(e.message || "Signup failed");
-    }
+    const res = await fetchRegisterAccount(userData);
+    if (res.success) return res.data;
+    return rejectWithValue(res.errors || res.message);
   }
 );
 
+// Login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (userData, { rejectWithValue }) => {
-    try {
-      const res = await fetchLogin(userData);
-      if (res.success) return res.data;
-      return rejectWithValue(res.message);
-    } catch (e) {
-      return rejectWithValue(e.message || "Login failed");
-    }
+    const res = await fetchLogin(userData);
+    if (res.success) return res.data;
+    return rejectWithValue(res.message);
   }
 );
 
+// Logout
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
   localStorage.removeItem("jwt_token");
   localStorage.removeItem("user");
@@ -54,11 +50,12 @@ export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
 });
 
 const authSlice = createSlice({
-  nameL: "auth",
+  name: "auth",
   initialState: getInitialAuthState(),
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Signup
       .addCase(signupUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -69,26 +66,30 @@ const authSlice = createSlice({
       })
       .addCase(signupUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Signup failed";
+        state.error = action.payload || "Signup failed";
       })
+
+      // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        const { token, user } = action.payload;
-        state.token = token;
-        state.user = user;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
         state.isAuthenticated = true;
         state.error = null;
-        localStorage.setItem("jwt_token", token);
-        localStorage.setItem("user", JSON.stringify(user));
+
+        localStorage.setItem("jwt_token", action.payload.token);
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Login failed";
       })
+
+      // Logout
       .addCase(logoutUser.fulfilled, (state) => {
         state.token = null;
         state.user = null;

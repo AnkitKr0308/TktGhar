@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 function Navbar() {
   const [currentTime, setCurrentTime] = useState("");
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const username = useSelector((state) => state.auth.user.username);
+  const username = useSelector((state) => state.auth.user?.username);
 
   console.log("Authentication: ", isAuthenticated);
   console.log("Username:", username);
@@ -52,7 +52,7 @@ function Navbar() {
             </div>
             {isAuthenticated && (
               <div className="text-gray-700 dark:text-white ml-6">
-                Welcome ${username}!
+                Welcome {username}!
               </div>
             )}
 

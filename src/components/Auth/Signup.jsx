@@ -19,7 +19,7 @@ function Signup() {
       required: true,
     },
     {
-      id: "username",
+      id: "userName",
       label: "Username",
       type: "text",
       required: true,
@@ -64,7 +64,10 @@ function Signup() {
       if (submit.error) {
         dispatch(setPopup({ message: "Signup failed", type: "error" }));
       } else if (res?.success) {
-        navigate("/");
+        dispatch(
+          setPopup({ message: "Account created successfully", type: "success" })
+        );
+        navigate("/login");
       } else if (res?.message && typeof res.message === "object") {
         setErrors(res.message);
       } else {
@@ -73,7 +76,7 @@ function Signup() {
         );
       }
     } catch (e) {
-      return { success: false, message: e.message || "Signup failed" };
+      return { success: false, message: e.message || "Network Error" };
     }
   };
 

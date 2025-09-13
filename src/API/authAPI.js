@@ -5,10 +5,7 @@ const baseURL = `${conf.train_tktghar_api_url}/api/users`;
 export const getAuthHeaders = () => {
   const token = localStorage.getItem("jwt_token");
   return token
-    ? {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      }
+    ? { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
     : { "Content-Type": "application/json" };
 };
 
@@ -19,18 +16,14 @@ export const fetchRegisterAccount = async (data) => {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-
     const result = await response.json();
 
     if (response.ok) {
-      return {
-        success: true,
-        data: result,
-        message: "Account created successfully",
-      };
+      return { success: true, data: result.user, message: result.message };
     } else {
       return {
         success: false,
+        errors: result.errors || null,
         message: result.message || "Registration failed",
       };
     }
@@ -47,13 +40,16 @@ export const fetchLogin = async (data) => {
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
+    const result = await response.json();
 
     if (response.ok) {
-      const result = await response.json();
-      return { success: true, data: result, message: "Login successful" };
+      return {
+        success: true,
+        data: { token: result.token, user: result.user },
+        message: result.message,
+      };
     } else {
-      const errorResult = await response.json();
-      return { success: false, message: errorResult.message || "Login failed" };
+      return { success: false, message: result.message || "Login failed" };
     }
   } catch (e) {
     console.error("Error in fetchLogin", e);

@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import Form from "../templates/Form";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../../store/authSlice";
+import { setPopup } from "../../store/popupSlice";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [formData, setFormData] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [errors, setErrors] = useState("");
 
   const loginFields = [
     {
@@ -24,6 +31,27 @@ function Login() {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
+  const handleLogin = async (formData) => {
+    try {
+      const submit = await dispatch(loginUser(formData));
+      const res = submit.payload;
+
+      if (submit.error) {
+        dispatch(setPopup({ message: "Login failed", type: "error" }));
+      } else if (res?.success) {
+        navigate("/");
+      } else if (res?.message && typeof res.message === "object") {
+        setErrors(res.message);
+      } else {
+        dispatch(
+          setPopup({ message: res?.message || "Login failed", type: "error" })
+        );
+      }
+    } catch (e) {
+      return { success: false, message: e.message || "Network Error" };
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800">
       <main className="container mx-auto p-6">
@@ -35,6 +63,8 @@ function Login() {
             fields={loginFields}
             onChange={handleInputChange}
             btnLabel="Login"
+            onSubmit={handleLogin}
+            errors={errors}
           />
         </section>
       </main>
