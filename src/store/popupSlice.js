@@ -6,23 +6,25 @@ const initialState = {
   type: "error", // Default type
 };
 
+let nextToastId = 1;
+
 const popupSlice = createSlice({
   name: "popup",
-  initialState,
+  initialState: { toasts: [] },
   reducers: {
     setPopup: (state, action) => {
-      const { message, type = "error" } = action.payload;
-      state.message = message;
-      state.type = type;
-      state.visible = true;
+      state.toasts.push({ id: nextToastId++, ...action.payload });
     },
-    clearPopup: (state) => {
-      state.message = "";
-      state.type = "error";
-      state.visible = false;
+    clearPopup: (state, action) => {
+      state.toasts = state.toasts.filter(
+        (toast) => toast.id !== action.payload
+      );
+    },
+    clearAll: (state) => {
+      state.toasts = [];
     },
   },
 });
 
-export const { setPopup, clearPopup } = popupSlice.actions;
+export const { setPopup, clearPopup, clearAll } = popupSlice.actions;
 export default popupSlice.reducer;

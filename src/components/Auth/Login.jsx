@@ -6,10 +6,10 @@ import { setPopup } from "../../store/popupSlice";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const [formData, setFormData] = useState("");
+  const [formData, setFormData] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [errors, setErrors] = useState("");
+  const [errors, setErrors] = useState({});
 
   const loginFields = [
     {
@@ -32,23 +32,21 @@ function Login() {
   };
 
   const handleLogin = async (formData) => {
+    setErrors({});
+
     try {
       const submit = await dispatch(loginUser(formData));
-      const res = submit.payload;
 
       if (submit.error) {
-        dispatch(setPopup({ message: "Login failed", type: "error" }));
-      } else if (res?.success) {
-        navigate("/");
-      } else if (res?.message && typeof res.message === "object") {
-        setErrors(res.message);
+        dispatch(setPopup({ message: submit.payload, type: "error" }));
       } else {
-        dispatch(
-          setPopup({ message: res?.message || "Login failed", type: "error" })
-        );
+        dispatch(setPopup({ message: "Login successful", type: "success" }));
+        navigate("/");
       }
     } catch (e) {
-      return { success: false, message: e.message || "Network Error" };
+      dispatch(
+        setPopup({ message: e.message || "Network Error", type: "error" })
+      );
     }
   };
 

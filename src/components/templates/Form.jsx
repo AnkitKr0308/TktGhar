@@ -105,6 +105,7 @@ function Form({
                   {errors[field.id]}
                 </span>
               )}
+
               {errors.general && (
                 <div className="text-red-500 text-center mb-4">
                   {errors.general}

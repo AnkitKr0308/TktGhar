@@ -59,24 +59,36 @@ function Signup() {
   const handleSignup = async (formData) => {
     try {
       const submit = await dispatch(signupUser(formData));
-      const res = submit.payload;
 
       if (submit.error) {
-        dispatch(setPopup({ message: "Signup failed", type: "error" }));
-      } else if (res?.success) {
+        // submit.payload can be string (general error) or object (field errors)
+        if (typeof submit.payload === "string") {
+          dispatch(setPopup({ message: submit.payload, type: "error" }));
+        } else if (typeof submit.payload === "object") {
+          setErrors(submit.payload);
+        }
+        return;
+      }
+
+      const res = submit.payload;
+
+      if (res?.success) {
         dispatch(
-          setPopup({ message: "Account created successfully", type: "success" })
+          setPopup({
+            message: res.message || "Account created successfully",
+            type: "success",
+          })
         );
         navigate("/login");
-      } else if (res?.message && typeof res.message === "object") {
-        setErrors(res.message);
+      } else if (res?.errors) {
+        setErrors(res.errors);
       } else {
-        dispatch(
-          setPopup({ message: res?.message || "Signup failed", type: "error" })
-        );
+        dispatch(setPopup({ message: "Signup failed", type: "error" }));
       }
     } catch (e) {
-      return { success: false, message: e.message || "Network Error" };
+      dispatch(
+        setPopup({ message: e.message || "Network Error", type: "error" })
+      );
     }
   };
 

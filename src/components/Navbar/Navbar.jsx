@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, useNavigate } from "react-router-dom";
+import { logoutUser } from "../../store/authSlice";
 
 function Navbar() {
   const [currentTime, setCurrentTime] = useState("");
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const username = useSelector((state) => state.auth.user?.username);
-
-  console.log("Authentication: ", isAuthenticated);
-  console.log("Username:", username);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateTime = () => {
@@ -26,6 +26,11 @@ function Navbar() {
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate("/login");
+  };
 
   return (
     <>
@@ -51,8 +56,8 @@ function Navbar() {
               [{currentTime}]
             </div>
             {isAuthenticated && (
-              <div className="text-gray-700 dark:text-white ml-6">
-                Welcome {username}!
+              <div className="text-gray-700 dark:text-white ml-6 font-medium">
+                Welcome <strong>{username}</strong>!
               </div>
             )}
 
@@ -139,6 +144,7 @@ function Navbar() {
                 <li>
                   <button
                     type="button"
+                    onClick={handleLogout}
                     className="text-red-700 hover:text-white border border-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 dark:focus:ring-red-900"
                   >
                     Logout
@@ -177,8 +183,7 @@ function Navbar() {
         </div>
       </nav>
 
-      {/* Add padding so the content appears after the fixed navbar */}
-      <header className="pt-20 bg-blue-600 text-white p-4">
+      <header className="pt-20 bg-blue-600 text-white p-4 mt-4">
         <h1 className="text-3xl font-semibold">
           Seamless Train Booking | Your Journey Starts Here
         </h1>

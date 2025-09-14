@@ -3,6 +3,7 @@ import Footer from "./components/Footer/Footer";
 import Navbar from "./components/Navbar/Navbar";
 
 import { Outlet } from "react-router-dom";
+import { Popup } from "./components/templates/Popup";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Navbar />
       <Outlet />
       <Footer />
+      <Popup />
     </div>
   );
 }

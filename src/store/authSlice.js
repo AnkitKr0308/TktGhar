@@ -27,10 +27,11 @@ export const signupUser = createAsyncThunk(
   "auth/signupUser",
   async (userData, { rejectWithValue }) => {
     const res = await fetchRegisterAccount(userData);
-    if (res.success) return res.data;
+    if (res.success) return res; // return full response { success, message, data }
     return rejectWithValue(res.errors || res.message);
   }
 );
+
 
 // Login
 export const loginUser = createAsyncThunk(

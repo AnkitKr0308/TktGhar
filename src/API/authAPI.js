@@ -23,8 +23,9 @@ export const fetchRegisterAccount = async (data) => {
     } else {
       return {
         success: false,
+        message:
+          result.errors?.message || result.message || "Registration failed",
         errors: result.errors || null,
-        message: result.message || "Registration failed",
       };
     }
   } catch (e) {
@@ -49,7 +50,10 @@ export const fetchLogin = async (data) => {
         message: result.message,
       };
     } else {
-      return { success: false, message: result.message || "Login failed" };
+      return {
+        success: false,
+        message: result.errors?.message || result.message || "Login failed",
+      };
     }
   } catch (e) {
     console.error("Error in fetchLogin", e);
