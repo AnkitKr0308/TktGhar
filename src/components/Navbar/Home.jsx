@@ -1,16 +1,37 @@
 import { useState } from "react";
+import Form from "../templates/Form";
 
 export default function HomePage() {
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
   const [journeyDate, setJourneyDate] = useState("");
+  const [formData, setFormData] = useState({});
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Redirect or fetch search results
     console.log("Searching tickets:", { source, destination, journeyDate });
-    // Example: navigate to /search-results?source=...&destination=...&date=...
   };
+
+  const fields = [
+    {
+      id: "fromStation",
+      label: "From",
+      type: "text",
+      required: true,
+    },
+    {
+      id: "toStation",
+      label: "To",
+      type: "select",
+      required: true,
+    },
+    {
+      id: "journeyDate",
+      label: "Journey Date",
+      type: "date",
+      required: true,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800">
@@ -20,51 +41,14 @@ export default function HomePage() {
             Book Your Train Tickets
           </h2>
 
-          <form onSubmit={handleSearch} className="space-y-4">
-            <div>
-              <label className="block mb-1 font-medium">Source Station</label>
-              <input
-                type="text"
-                value={source}
-                onChange={(e) => setSource(e.target.value)}
-                placeholder="Enter Source Station"
-                required
-                className="w-full px-4 py-2 border rounded"
-              />
-            </div>
+          <Form fields={fields} />
 
-            <div>
-              <label className="block mb-1 font-medium">
-                Destination Station
-              </label>
-              <input
-                type="text"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                placeholder="Enter Destination Station"
-                required
-                className="w-full px-4 py-2 border rounded"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-1 font-medium">Journey Date</label>
-              <input
-                type="date"
-                value={journeyDate}
-                onChange={(e) => setJourneyDate(e.target.value)}
-                required
-                className="w-full px-4 py-2 border rounded"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-            >
-              Search Trains
-            </button>
-          </form>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition mt-4"
+          >
+            Search Trains
+          </button>
         </section>
 
         <section className="mt-12 text-center">

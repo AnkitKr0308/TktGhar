@@ -6,6 +6,7 @@ function Form({
   onChange,
   btnLabel,
   onSubmit,
+  disabled,
   errors = {},
 
   ...props
@@ -29,7 +30,21 @@ function Form({
                 {field.required && <span className="text-red-500">*</span>}
               </label>
 
-              {field.type === "text-area" ? (
+              {field.type === "date" ? (
+                <input
+                  id={field.id}
+                  name={field.id}
+                  type="date"
+                  onChange={onChange}
+                  readOnly={field.readOnly || false}
+                  value={formData?.[field.id] ?? ""}
+                  required={field.required || false}
+                  className="border rounded-lg p-3 text-gray-700 shadow-sm hover:shadow-md 
+               focus:outline-none focus:ring-2 focus:ring-indigo-500 
+               focus:border-indigo-500 placeholder-gray-400 transition duration-300"
+                  {...props}
+                />
+              ) : field.type === "text-area" ? (
                 <textarea
                   id={field.id}
                   name={field.id}
@@ -85,20 +100,28 @@ function Form({
                   {...props}
                 />
               ) : (
-                <input
-                  id={field.id}
-                  name={field.id}
-                  type={field.type || "text"}
-                  placeholder={field.placeholder}
-                  onChange={onChange}
-                  readOnly={field.readOnly || false}
-                  value={formData?.[field.id] ?? ""}
-                  required={field.required || false}
-                  className="border rounded-lg p-3 text-gray-700 shadow-sm hover:shadow-md 
-                         focus:outline-none focus:ring-2 focus:ring-indigo-500 
-                         focus:border-indigo-500 placeholder-gray-400 transition duration-300"
-                  {...props}
-                />
+                <>
+                  <input
+                    id={field.id}
+                    name={field.id}
+                    type="text"
+                    list={field.options ? `${field.id}-list` : undefined}
+                    placeholder={field.placeholder}
+                    onChange={onChange}
+                    value={formData?.[field.id] ?? ""}
+                    required={field.required || false}
+                    className="border rounded-lg p-3 text-gray-700 shadow-sm hover:shadow-md 
+               focus:outline-none focus:ring-2 focus:ring-indigo-500 
+               focus:border-indigo-500 placeholder-gray-400 transition duration-300"
+                  />
+                  {field.options && (
+                    <datalist id={`${field.id}-list`}>
+                      {field.options.map((option, idx) => (
+                        <option key={idx} value={option} />
+                      ))}
+                    </datalist>
+                  )}
+                </>
               )}
               {errors[field.id] && (
                 <span className="text-red-500 text-sm mt-1">
@@ -114,12 +137,15 @@ function Form({
             </div>
           ))}
         </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-        >
-          {btnLabel}
-        </button>
+        {btnLabel && (
+          <button
+            type="submit"
+            disabled={disabled}
+            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+          >
+            {btnLabel}
+          </button>
+        )}
       </form>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Form from "../templates/Form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../store/authSlice";
 import { setPopup } from "../../store/popupSlice";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,8 @@ function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
+  const loading = useSelector((state) => state.auth?.loading);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loginFields = [
     {
@@ -32,7 +34,9 @@ function Login() {
   };
 
   const handleLogin = async (formData) => {
+    if (isSubmitting) return;
     setErrors({});
+    setIsSubmitting(true);
 
     try {
       const submit = await dispatch(loginUser(formData));
@@ -47,6 +51,8 @@ function Login() {
       dispatch(
         setPopup({ message: e.message || "Network Error", type: "error" })
       );
+    } finally {
+      setIsSubmitting(false); // Re-enable button
     }
   };
 
@@ -60,9 +66,10 @@ function Login() {
             formData={formData}
             fields={loginFields}
             onChange={handleInputChange}
-            btnLabel="Login"
+            btnLabel={loading ? "Logging in..." : "Login"}
             onSubmit={handleLogin}
             errors={errors}
+            disabled={isSubmitting}
           />
         </section>
       </main>

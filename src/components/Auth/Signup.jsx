@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Form from "../templates/Form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { signupUser } from "../../store/authSlice";
 import { setPopup } from "../../store/popupSlice";
@@ -10,6 +10,8 @@ function Signup() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
+  const loading = useSelector((state) => state.auth?.loading);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const signupFields = [
     {
@@ -57,6 +59,9 @@ function Signup() {
   };
 
   const handleSignup = async (formData) => {
+    if (isSubmitting) return;
+    setErrors({});
+    setIsSubmitting(true);
     try {
       const submit = await dispatch(signupUser(formData));
 
@@ -89,6 +94,8 @@ function Signup() {
       dispatch(
         setPopup({ message: e.message || "Network Error", type: "error" })
       );
+    } finally {
+      setIsSubmitting(false); // Re-enable button
     }
   };
 
@@ -102,9 +109,10 @@ function Signup() {
             formData={formData}
             fields={signupFields}
             onChange={handleInputChange}
-            btnLabel="Register Account"
+            btnLabel={loading ? "Creating Account..." : "Register Account"}
             onSubmit={handleSignup}
             errors={errors}
+            disabled={isSubmitting}
           />
         </section>
       </main>
