@@ -2,12 +2,19 @@ import { useEffect, useState } from "react";
 import Form from "../templates/Form";
 import { useDispatch, useSelector } from "react-redux";
 import { getStations } from "../../store/stationSlice";
+import { getAvailableTrains } from "../../store/trainSlice";
+import { useNavigate } from "react-router-dom";
+import { setPopup } from "../../store/popupSlice";
 
 export default function HomePage() {
   const [source, setSource] = useState([]);
   const [destination, setDestination] = useState([]);
   const [journeyDate, setJourneyDate] = useState("");
   const [formData, setFormData] = useState({});
+  const [filteredSource, setFilteredSource] = useState([]);
+  const [filteredDestination, setFilteredDestination] = useState([]);
+  const navigate = useNavigate();
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -22,18 +29,51 @@ export default function HomePage() {
     stations();
   });
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "fromStation") {
+      const filtered = source.filter((s) =>
+        s.StationName.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredSource(filtered);
+    }
+
+    if (name === "toStation") {
+      const filtered = destination.filter((s) =>
+        s.StationName.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredDestination(filtered);
+    }
+  };
+
+  const handleSearchAvailableTrains = async () => {
+    const res = await dispatch(getAvailableTrains(formData));
+
+    if (res.error) {
+      dispatch(setPopup({ message: res.payload, type: "error" }));
+    } else {
+      navigate("/");
+    }
+  };
+
   const fields = [
     {
       id: "fromStation",
       label: "From",
       type: "text",
       required: true,
+      options: filteredSource.map((s) => `${s.StationName} (${s.StationCode})`),
     },
     {
       id: "toStation",
       label: "To",
-      type: "select",
+      type: "text",
       required: true,
+      options: filteredDestination.map(
+        (s) => `${s.StationName} (${s.StationCode})`
+      ),
     },
     {
       id: "journeyDate",
@@ -51,10 +91,15 @@ export default function HomePage() {
             Book Your Train Tickets
           </h2>
 
-          <Form fields={fields} />
+          <Form
+            fields={fields}
+            onChange={handleInputChange}
+            formData={formData}
+          />
 
           <button
             type="submit"
+            onClick={handleSearchAvailableTrains}
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition mt-4"
           >
             Search Trains
