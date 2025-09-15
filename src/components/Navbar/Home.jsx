@@ -1,16 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Form from "../templates/Form";
+import { useDispatch, useSelector } from "react-redux";
+import { getStations } from "../../store/stationSlice";
 
 export default function HomePage() {
-  const [source, setSource] = useState("");
-  const [destination, setDestination] = useState("");
+  const [source, setSource] = useState([]);
+  const [destination, setDestination] = useState([]);
   const [journeyDate, setJourneyDate] = useState("");
   const [formData, setFormData] = useState({});
+  const dispatch = useDispatch();
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log("Searching tickets:", { source, destination, journeyDate });
-  };
+  useEffect(() => {
+    const stations = async () => {
+      const stn = await dispatch(getStations());
+      console.log(stn);
+      if (stn.success) {
+        setSource(stn);
+        setDestination(stn);
+      }
+    };
+    stations();
+  });
 
   const fields = [
     {
